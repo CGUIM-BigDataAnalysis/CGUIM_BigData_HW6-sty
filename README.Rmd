@@ -1,34 +1,23 @@
 ---
-title: "報告主題：居安思維-桃園市"
+title: "居安思維-桃園"
 output: github_document
 ---
 
 組員姓名：游思亭
 
-### 資料介紹
+## 分析議題背景
+禮運大同篇：「....是故謀閉而不興，盜竊亂賊而不作，故外戶而不閉，是謂『大同』。」在每個人心中都有個小烏托邦。然而，近幾年來卻發生了許多社會事件，導致普羅大眾人心惶惶。
 
-#### 1. 犯罪資料
+## 分析動機
+從古至今人們即在追求居安的生活品質，不論老少都需要一個安全穩定居住品質。因此，想要了解桃園市的優質居住區域，藉由犯罪資料來分析出較適合的居住空間。
 
-來源：http://data.gov.tw/node/14200
+## 使用資料
+1. 105年犯罪資料
+2. 桃園市狹小巷弄
 
-格式：.CSV
-
-資料描述：提供毒品、強盜、搶奪、住宅盜竊、汽車竊盜、機車竊盜、強制性交等7案類犯罪發生資料。
-
-欄位：案類、發生日期、發生地點（鄉、鎮、市、區
-
-#### 2. 桃園市狹小巷弄列管清冊
-
-來源：http://data.tycg.gov.tw/opendata/datalist/datasetMeta?oid=65c58683-220f-4075-a555-f80c7e580e5e
-
-格式：.CSV
-
-資料描述：桃園市政府消防局搶救不易地區-狹小巷弄列管清冊，總計392處
-
-欄位：序號、行政區、狹小巷弄地址
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+載入使用資料們
+```{r}
+#這是R Code Chunk
 # 載入犯罪資料
 library(readr)
 cridata0103 <- read_csv("~/Desktop/105犯罪資料/10501-10503criminaldata.csv.xls")
@@ -39,51 +28,33 @@ cridata1012 <- read_csv("~/Desktop/105犯罪資料/10510-10512criminaldata.csv.x
 narrowalley <- read_csv("~/Desktop/潛在危險/NarrowAlleyTY.csv")
 ```
 
-### 分析議題
+## 資料處理與清洗
+・105年犯罪資料 cridata0112_ty
 
-#### 1. 議題背景 :
+讀取下的105年犯罪資料以每季作為區隔，且為全台犯罪紀錄資料。先將每季犯罪資料合併，刪除多於欄位X4，並將欄位名稱重新命名，以防字元錯誤的問題發生。篩選出桃園市犯罪資料，檢查發生地點欄位值的內容發現有“桃園市”及“桃園市桃園區”的存在，兩者應為同一欄位內容，為保留“桃園市桃園區”，因此先判斷欄位值是否為“桃園市”，並新增欄位index，最後將欄位值為“桃園市”的資料改為“桃園市桃園區”。
 
-禮運大同篇：「....是故謀閉而不興，盜竊亂賊而不作，故外戶而不閉，是謂『大同』。」在每個人心中都有個小烏托邦。然
-
-而，近幾年來卻發生了許多社會事件，導致普羅大眾人心惶惶。
-
-#### 2. 議題動機 :
-
-從古至今人們即在追求居安的生活品質，不論老少都需要一個安全穩定居住品質。因此，想要了解桃園市的優質居住區域，藉
-
-由犯罪資料來分析出較適合的居住空間。
-
-#### 3. 議題假設：
-
-每個人都是桃園人，每個人都想在桃園地區找到較安全的行政區來居住。並參考桃園市自變更為直轄市後的分區發展願景
-
-(出處：https://www.moneydj.com/Topics/taoyuan/)。
-
-#### 4. 資料處理 :
-
-・犯罪資料・
-
-首先將每季犯罪資料合併，刪除多於欄位，並將欄位名稱重新命名，以防字元錯誤的問題發生。
-
-接著篩選出桃園市犯罪資料，檢查發生地點欄位值的內容發現有“桃園市”及“桃園市桃園區”的存在，兩者應為同一欄位內容，
-
-保留“桃園市桃園區”。
-
-・桃園市狹小巷弄列管清冊・
-
-將欄位名稱重新命名
+   step1. 將合併每季犯罪資料 
+   
+   step2. 將犯罪資料第四欄位X4去除 
+   
+   step3. 更改cridata0112_tw欄位名稱: Type, Date, Site 
+   
+   step4. 將桃園市所有犯罪資料篩選出 
+   
+   step5. 將cridata0112_ty的發生地點“桃園市”改為“桃園市桃園區”
 
 
-```{r cars}
-# （一）讀取下的105年犯罪資料以每季作為區隔，為全台犯罪紀錄資料。
-# 每季犯罪資料前三筆
-knitr::kable(head(cridata0103,3))
-knitr::kable(head(cridata0406,3))
-knitr::kable(head(cridata0709,3))
-knitr::kable(head(cridata1012,3))
-# 狹小巷弄資料前三筆
-knitr::kable(head(narrowalley,3))
-# （二）觀察資料去除多餘或不全並做整理
+・狹小巷弄資料 narrowalley_ty
+
+備份狹小巷弄資料narrowalley_ty，並將欄位名稱重新命名，以防字元錯誤的問題發生。
+
+   step1. 將narrowalley備份 
+   
+   step2. 更改narrowalley_ty欄位名稱: Site, Address
+   
+處理資料
+```{r}
+#這是R Code Chunk
 # 1. 105年犯罪資料
 # 合併每季犯罪資料 
 # cridata0112
@@ -111,8 +82,7 @@ cridata0112_ty_T <- cridata0112_ty_T[grep("TRUE",cridata0112_ty_T$C),]
 # 將“桃園市”改為“桃園市桃園區” 
 # cridata0112_ty
 cridata0112_ty$Site[cridata0112_ty_T$index] <- "桃園市桃園區"
-# 105年桃園市犯罪資料前三筆
-knitr::kable(head(cridata0112_ty,3))
+knitr::kable(cridata0112_ty)
 
 # 2. 狹小巷弄資料
 # 更改欄位名稱: Site, Address
@@ -120,169 +90,93 @@ knitr::kable(head(cridata0112_ty,3))
 narrowalley_ty <- narrowalley
 # 更改欄位名稱: Site, Address
 names(narrowalley_ty) <- c("Site","Address")
-# 狹小巷弄資料前三筆
-knitr::kable(head(narrowalley_ty,3))
+knitr::kable(narrowalley_ty)
 ```
 
-## 分析結果
-
-由以下的資料分析出的數據顯示，在桃園地區南北縱向的政經科教的區域較沒有表面上看起來的生活安全，雖然是桃園市的政治中
-
-心地帶，有可能也因為人多混雜，人口流動頻繁，又都市區域劃分為多種用途，導致成為“大雜會”都心，反而在東西橫向的行政區
-
-犯罪情形較沒那麼多，可能居住民眾較淳樸、人口流動較平緩等因素，使得犯罪的機率與潛在危險的狹小巷弄相對少些。
-
-因此，最後建議不太要求生活機能的卻因安全因素的考量的你們，可以考慮東西橫向的行政區來居住喔。另外，東西橫向的區域的
-
-發展核心偏向觀光、航空、港口，選擇這些地區感覺也不錯還可以觀看海岸線，體驗民俗文化等，陶冶一下性情！
-
-```{r pressure, echo=FALSE}
+## 探索式資料分析
+圖文並茂圖文並茂
+```{r}
+#這是R Code Chunk
 # 1. 105年犯罪資料
 # 統計桃園各案類犯罪資料
 # cridata0112_ty_type
 cridata0112_ty_type <- data.frame(table(cridata0112_ty$Type))
 # 更改欄位名稱: Type, Quantity
 names(cridata0112_ty_type) <- c("Type","Quantity")
-# 備份 cridata0112_ty_type0
-cridata0112_ty_type0 <- cridata0112_ty_type
-# 更改欄位名稱: "犯罪案類", "案類數量"
-names(cridata0112_ty_type) <- c("犯罪案類","案類數量")
-# 長條圖
-library("RColorBrewer")
-library(ggplot2)
-ggplot() +
-  geom_bar(data=cridata0112_ty_type0,
-           aes(x = reorder(Type,Quantity), y = Quantity),
-           fill =  brewer.pal(7, "YlGnBu")[cridata0112_ty_type0$Type],
-           stat = "identity") + 
-  ggtitle("桃園市犯罪案類數量統計") + 
-  xlab("犯罪案類") + ylab("案類數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 從上圖可以看出桃園市犯罪案件類型最高的為毒品
 # 由大到小排序
-cridata0112_ty_type <- cridata0112_ty_type[order(cridata0112_ty_type$案類數量,decreasing = TRUE),]
-# 更改列名: 1~7
-rownames(cridata0112_ty_type) <- c(1:7)
+cridata0112_ty_type <- cridata0112_ty_type[order(cridata0112_ty_type$Quantity, decreasing = TRUE),]
+# 將Type欄位內容改為英文
+cridata0112_ty_type$Type <- c("D","MT","MVT","B",
+                               "R","FT","FSI")
+criminaltype <- c("D: Drugs","MT: Motorcycle Theft",
+                  "MVT: Motor Vehicle Theft", "B: Burglary",
+                  "R: Robbery",
+                  "FT: Forceful Taking",
+                  "FSI: Forcible Sexual Intercourse")
+# 分別將案類、數量取出
+critype <- cridata0112_ty_type$Type
+criquan <- cridata0112_ty_type$Quantity
+# 將數量資料轉成matrix
+matrix_cridata0112_ty_type <- matrix(criquan)
+# 轉置matrix
+matrix_cridata0112_ty_type <- t(matrix_cridata0112_ty_type)
+# 更改欄位名
+colnames(matrix_cridata0112_ty_type) <- critype
 # 犯罪類型最高統計
-knitr::kable(cridata0112_ty_type)
-
-# 將毒品資料找出
-tyDS <- cridata0112_ty[grep("毒品",cridata0112_ty$Type),]
-# 統計個行政區毒品犯罪數量
-tyDSTotal <- data.frame(table(tyDS$Site))
-# 更改欄位名稱
-colnames(tyDSTotal) <- c("桃園市行政區","毒品犯罪數量")
-# 將“桃園市”取代為“”
-tyDSTotal$桃園市行政區 <- sub("桃園市","",tyDSTotal$桃園市行政區)
+knitr::kable(matrix_cridata0112_ty_type)
 # 長條圖
-library(ggplot2)
-ggplot(data=tyDSTotal) + 
-  geom_bar(aes(x = reorder(桃園市行政區,毒品犯罪數量), y = 毒品犯罪數量),
-           fill=colorRampPalette(c("#fff3b8","#67b5b7", "#003f8e"))(13),
-           stat = "identity") + 
-  ggtitle("桃園市區域毒品犯罪數量統計") + 
-  xlab("桃市區域") + ylab("毒品犯罪數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 由大到小排序
-tyDSTotal <- tyDSTotal[order(tyDSTotal$毒品犯罪數量,decreasing = TRUE),]
-# 更改列名: 1~13
-rownames(tyDSTotal) <- c(1:13)
-knitr::kable(tyDSTotal)
-
-# 將機車竊盜資料找出
-tyMT <- cridata0112_ty[grep("機車竊盜",cridata0112_ty$Type),]
-# 統計個行政區毒品犯罪數量
-tyMTTotal <- data.frame(table(tyMT$Site))
-# 更改欄位名稱
-colnames(tyMTTotal) <- c("桃園市行政區","機車竊盜犯罪數量")
-# 將“桃園市”取代為“”
-tyMTTotal$桃園市行政區 <- sub("桃園市","",tyMTTotal$桃園市行政區)
-# 長條圖
-library(ggplot2)
-ggplot(data=tyMTTotal) + 
-  geom_bar(aes(x = reorder(桃園市行政區,機車竊盜犯罪數量), y = 機車竊盜犯罪數量),
-           fill=colorRampPalette(c("#fff3b8","#67b5b7", "#003f8e"))(13),
-           stat = "identity") + 
-  ggtitle("桃園市區域機車竊盜犯罪數量統計") + 
-  xlab("桃市區域") + ylab("機車竊盜犯罪數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 由大到小排序
-tyMTTotal <- tyMTTotal[order(tyMTTotal$機車竊盜犯罪數量,decreasing = TRUE),]
-# 更改列名: 1~13
-rownames(tyMTTotal) <- c(1:13)
-knitr::kable(tyMTTotal)
-
-# 將汽車竊盜資料找出
-tyCT <- cridata0112_ty[grep("汽車竊盜",cridata0112_ty$Type),]
-# 統計個行政區毒品犯罪數量
-tyCTTotal <- data.frame(table(tyCT$Site))
-# 更改欄位名稱
-colnames(tyCTTotal) <- c("桃園市行政區","汽車竊盜犯罪數量")
-# 將“桃園市”取代為“”
-tyCTTotal$桃園市行政區 <- sub("桃園市","",tyCTTotal$桃園市行政區)
-# 長條圖
-library(ggplot2)
-ggplot(data=tyCTTotal) + 
-  geom_bar(aes(x = reorder(桃園市行政區,汽車竊盜犯罪數量), y = 汽車竊盜犯罪數量),
-           fill=colorRampPalette(c("#fff3b8","#67b5b7", "#003f8e"))(13),
-           stat = "identity") + 
-  ggtitle("桃園市區域汽車竊盜犯罪數量統計") + 
-  xlab("桃市區域") + ylab("汽車竊盜犯罪數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 由大到小排序
-tyCTTotal <- tyCTTotal[order(tyCTTotal$汽車竊盜犯罪數量,decreasing = TRUE),]
-# 更改列名: 1~13
-rownames(tyCTTotal) <- c(1:13)
-knitr::kable(tyCTTotal)
+barplot(matrix_cridata0112_ty_type, 
+        xlab = "Criminal Type",
+        ylab = "Quantity",
+        col = "#FF7256",
+        legend.text = criminaltype,
+        width = 1, space = 0.1, main = "TaoYuan Criminal Type")
+# 從上圖可以看出桃園市犯罪案件類型最高的為毒品
 
 # 統計桃園各區發生犯罪的數量
 # cridata0112_ty_site
 cridata0112_ty_site <- data.frame(table(cridata0112_ty$Site))
 # 更改欄位名稱: Site, Quantity
 names(cridata0112_ty_site) <- c("Site","Quantity")
+# 由大到小排序
+cridata0112_ty_site <- cridata0112_ty_site[order(cridata0112_ty_site$Quantity, decreasing = TRUE),]
 # 將“桃園市”取代為“”
 cridata0112_ty_site$Site <- sub("桃園市","",cridata0112_ty_site$Site)
-# 備份 cridata0112_ty_type0
-cridata0112_ty_site0 <- cridata0112_ty_site
-# 更改欄位名稱: "桃市區域", "犯罪數量"
-names(cridata0112_ty_site) <- c("桃市區域","犯罪數量")
-# 長條圖
-library(ggplot2)
-ggplot(data=cridata0112_ty_site0) + 
-  geom_bar(aes(x = reorder(Site,Quantity), y = Quantity),
-           fill=colorRampPalette(c("#fff3b8","#67b5b7", "#003f8e"))(13),
-           stat = "identity") + 
-  ggtitle("桃園市區域犯罪數量統計") + 
-  xlab("桃市區域") + ylab("犯罪數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 從上圖可以看出桃園市犯罪最高的行政區
-# 由大到小排序
-cridata0112_ty_site <- cridata0112_ty_site[order(cridata0112_ty_site$犯罪數量, decreasing = TRUE),]
-# 更改列名: 1~13
-rownames(cridata0112_ty_site) <- c(1:13)
+# 將Site欄位內容改為英文
+cridata0112_ty_site$Site <- c("TY","JLI",
+                              "BD","PJ",
+                              "GS","LT",
+                              "YM","DS",
+                              "LJ","DY",
+                              "GY","SW",
+                              "FS")
+criminalsite <- c("TY: Taoyuan District","JLI: Jhongli District",
+                  "BD: Bade District","PJ: Pingjen District",
+                  "GS: Gueishan District","LT: Longtan District",
+                  "YM: Yangmei District","DS: Dasi District",
+                  "LJ: Lujhu District","DY: Dayuan District",
+                  "GY: Guanyin District","SW: Sinwu District",
+                  "FS: Fusing District")
+# 分別將案類、數量取出
+crisite <- cridata0112_ty_site$Site
+crisquan <- cridata0112_ty_site$Quantity
+# 將數量資料轉成matrix
+matrix_cridata0112_ty_site <- matrix(crisquan)
+# 轉置matrix
+matrix_cridata0112_ty_site <- t(matrix_cridata0112_ty_site)
+# 更改欄位名
+colnames(matrix_cridata0112_ty_site) <- crisite
 # 各區域犯罪統計
-knitr::kable(cridata0112_ty_site)
-
+knitr::kable(matrix_cridata0112_ty_site)
+# 長條圖
+barplot(matrix_cridata0112_ty_site, 
+        xlab = "Taoyuan Areas",
+        ylab = "Quantity",
+        col = "#FF7256",
+        legend.text = criminalsite,
+        xpd = TRUE,
+        width = 1, space = 0.1, main = "TaoYuan Various Areas Crime Statistics")
+# 從上圖可以看出桃園市犯罪最高的行政區
 
 # 2. 狹小巷弄資料
 # 統計桃園各行政區狹小巷弄數量
@@ -291,50 +185,44 @@ narrowalley_ty_site <- data.frame(table(narrowalley_ty$Site))
 # 更改欄位名稱: Site, Quantity
 # 桃園市目前轄有12個區和1個直轄市山地原住民區
 names(narrowalley_ty_site) <- c("Site","Quantity")
-# 備份 narrowalley_ty_site0
-narrowalley_ty_site0 <- narrowalley_ty_site
-# 更改欄位名稱: "桃市區域", "狹小巷弄數量"
-names(narrowalley_ty_site) <- c("桃市區域","狹小巷弄數量")
-# 長條圖
-library(ggplot2)
-ggplot(data=narrowalley_ty_site0) + 
-  geom_bar(aes(x = reorder(Site,Quantity), y = Quantity),
-           fill=colorRampPalette(c("#fff3b8","#67b5b7", "#003f8e"))(12),
-           stat = "identity") + 
-  ggtitle("桃園市區域狹小巷弄數量統計") + 
-  xlab("桃市區域") + ylab("狹小巷弄數量") +
-  theme_bw() + 
-  theme(text = element_text(family="黑體-繁 中黑", size=10),
-        panel.border = element_rect(colour = "#323232"),
-        panel.grid = element_line(colour = "#F5F5F5",size = 0.2),
-        plot.title = element_text(hjust = 0.5))
-# 從上圖可以看出桃園市擁有多狹小巷弄的行政區
 # 由大到小排序
-narrowalley_ty_site <- narrowalley_ty_site[order(narrowalley_ty_site$狹小巷弄數量, decreasing = TRUE),]
-# 更改列名: 1~12
-rownames(narrowalley_ty_site) <- c(1:12)
+narrowalley_ty_site <- narrowalley_ty_site[order(narrowalley_ty_site$Quantity, decreasing = TRUE),]
+# 將Site欄位內容改為英文
+narrowalley_ty_site$Site <- c("JLI","TY","BD","LJ",
+                              "GS","PJ","LT","YM",
+                              "DS","SW","DY","GY")
+narrowalleysite <- c("JLI: Jhongli District","TY: Taoyuan District",
+                  "BD: Bade District","LJ: Lujhu District",
+                  "GS: Gueishan District","PJ: Pingjen District",
+                  "LT: Longtan District","YM: Yangmei District",
+                  "DS: Dasi District","SW: Sinwu District",
+                  "DY: Dayuan District","GY: Guanyin District")
+# 分別將區域、數量取出
+narsite <- narrowalley_ty_site$Site
+narquan <- narrowalley_ty_site$Quantity
+# 將數量資料轉成matrix
+matrix_narrowalley_ty_site <- matrix(narquan)
+# 轉置matrix
+matrix_narrowalley_ty_site <- t(matrix_narrowalley_ty_site)
+# 更改欄位名
+colnames(matrix_narrowalley_ty_site) <- narsite
 # 各區域狹小巷弄統計
-knitr::kable(narrowalley_ty_site)
+knitr::kable(matrix_narrowalley_ty_site)
+# 長條圖
+barplot(matrix_narrowalley_ty_site, 
+        xlab = "Taoyuan Dist.",
+        ylab = "Quantity",
+        col = "#FF7256",
+        legend.text = narrowalleysite,
+        width = 5, 
+        space = 0.1, 
+        xpd = TRUE,
+        main = "TaoYuan Narrow Alley Statistics")
+# 從上圖可以看出桃園市擁有多狹小巷弄的行政區
 ```
 
-### 分析結果可能解決問題
-
-分析結果讓桃園人在選擇居住地區時有了另外一種考量，也大概了解各行政區域的環境是否符合自己心
-
-中所想的“居安”品質。
-
-### 參考資料
-
-#### 1. 桃園開放資料-桃園狹小巷弄清冊
-
-http://data.tycg.gov.tw/opendata/datalist/datasetMeta?oid=65c58683-220f-4075-a555-f80c7e580e5e
-
-#### 2. 政府資料開放平臺-犯罪資料
-
-http://data.gov.tw/node/14200 
-
-#### 3. 老師講義
-
-#### 4. MoneyDJ理財網專題報導
-
-https://www.moneydj.com/Topics/taoyuan/
+## 期末專題分析規劃
+以桃園市犯罪統計資料作為依據，來交叉比對出最少犯罪之居住區域。
+以桃園市狹小巷弄資料作為依據，來交叉比對出未來(潛在危險)可能發生事件之空間。
+最後期望透過分析過後可以找出讓民眾安全居住的區域。
+另外，是否在政府資源越多的城市之中犯罪率越高呢？
